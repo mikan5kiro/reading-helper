@@ -1,0 +1,117 @@
+<!-- pages/finished/finished.wxml -->
+<view class="page-container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">已读书籍</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{isLoading}}" class="loading-container">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{groupedBooks.length === 0}}" class="empty-container">
+    <text class="empty-icon">📖</text>
+    <text class="empty-text">还没有已读书籍</text>
+    <text class="empty-subtext">读完书籍后会显示在这里</text>
+  </view>
+
+  <!-- 月份分组书籍列表 -->
+  <scroll-view wx:else class="book-list" scroll-y>
+    <view wx:for="{{groupedBooks}}" wx:key="month" class="month-group">
+      <!-- 月份标题 -->
+      <view class="month-header">
+        <text class="month-title">{{item.month}}</text>
+        <text class="month-count">{{item.books.length}} 本</text>
+      </view>
+
+      <!-- 书籍列表 -->
+      <view class="books-container">
+        <view wx:for="{{item.books}}" wx:key="id" class="book-card">
+          <!-- 书籍信息 -->
+          <view class="book-info">
+            <view class="book-header">
+          <text class="book-title">{{item.title}}</text>
+          <view class="more-btn" bindtap="showMoreMenu" data-bookid="{{item.id}}">
+            <text class="more-icon">⋯</text>
+          </view>
+        </view>
+            <text wx:if="{{item.author}}" class="book-author">{{item.author}}</text>
+            <text class="finished-date">{{item.finishedDateStr}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 操作菜单 -->
+  <action-sheet hidden="{{!showMoreMenu}}" bindchange="hideMoreMenu">
+    <action-sheet-item bindtap="editBook">编辑</action-sheet-item>
+    <action-sheet-item bindtap="deleteBook" color="#ff4d4f">删除</action-sheet-item>
+    <action-sheet-cancel bindtap="hideMoreMenu">取消</action-sheet-cancel>
+  </action-sheet>
+
+  <!-- 编辑书籍弹窗 -->
+  <view wx:if="{{showEditModal}}" class="modal-overlay" bindtap="hideEditModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <!-- 弹窗标题 -->
+      <view class="modal-header">
+        <text class="modal-title">编辑书籍</text>
+        <view class="modal-close" bindtap="hideEditModal">
+          <text>×</text>
+        </view>
+      </view>
+
+      <!-- 表单内容 -->
+      <view class="modal-body">
+        <!-- 书名 -->
+        <view class="form-group">
+          <text class="form-label">书名</text>
+          <input 
+            class="form-input" 
+            type="text" 
+            placeholder="请输入书名" 
+            value="{{formData.title}}"
+            bindinput="onFormInput"
+            data-field="title"
+          />
+        </view>
+
+        <!-- 作者 -->
+        <view class="form-group">
+          <text class="form-label">作者</text>
+          <input 
+            class="form-input" 
+            type="text" 
+            placeholder="选填" 
+            value="{{formData.author}}"
+            bindinput="onFormInput"
+            data-field="author"
+          />
+        </view>
+
+        <!-- 类别 -->
+        <view class="form-group">
+          <text class="form-label">类别</text>
+          <picker mode="selector" range="{{categories}}" value="{{editCategoryIndex}}" bindchange="onEditCategoryChange">
+            <view class="form-input picker-input">
+              <text wx:if="{{formData.category}}">{{formData.category}}</text>
+              <text wx:else class="placeholder">选填</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <!-- 弹窗操作按钮 -->
+      <view class="modal-footer">
+        <view class="btn btn-secondary" bindtap="hideEditModal">
+          <text>取消</text>
+        </view>
+        <view class="btn btn-primary" bindtap="submitEditForm">
+          <text>保存</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

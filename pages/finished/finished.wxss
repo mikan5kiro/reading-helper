@@ -1,0 +1,139 @@
+/* pages/finished/finished.wxss */
+
+/* 页面容器 */
+.page-container {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+}
+
+/* 页面头部 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333333;
+}
+
+/* 书籍列表 */
+.book-list {
+  padding: 16px;
+  min-height: calc(100vh - 80px);
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 80px);
+  background-color: #f8f8f8;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #8a8a8a;
+}
+
+/* 空状态 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 80px);
+  padding: 32px;
+  background-color: #f8f8f8;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.empty-text {
+  font-size: 18px;
+  color: #8a8a8a;
+  margin-bottom: 8px;
+}
+
+.empty-subtext {
+  font-size: 14px;
+  color: #8a8a8a;
+  text-align: center;
+}
+
+/* 月份分组 */
+.month-group {
+  margin-bottom: 32px;
+}
+
+/* 月份标题 */
+.month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.month-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.month-count {
+  font-size: 14px;
+  color: #8a8a8a;
+}
+
+/* 书籍容器 */
+.books-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 书籍卡片 */
+.book-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+}
+
+/* 书籍信息 */
+.book-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333333;
+  display: block;
+}
+
+.book-author {
+  font-size: 14px;
+  color: #8a8a8a;
+  display: block;
+}
+
+/* 完成日期 */
+.finished-date {
+  font-size: 12px;
+  color: #8a8a8a;
+  margin-top: 4px;
+}

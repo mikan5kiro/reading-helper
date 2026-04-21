@@ -1,12 +1,49 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/logs/logs"
+    "pages/finished/finished",
+    "pages/wishlist/wishlist",
+    "pages/profile/profile"
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
-    "navigationBarBackgroundColor": "#ffffff"
+    "navigationBarTitleText": "读书助手",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f8f8f8"
+  },
+  "tabBar": {
+    "color": "#8a8a8a",
+    "selectedColor": "#2563eb",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "fontSize": "16px",
+    "selectedFontSize": "16px",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "在读",
+        "iconPath": "images/tab-reading.png",
+        "selectedIconPath": "images/tab-reading-active.png"
+      },
+      {
+        "pagePath": "pages/finished/finished",
+        "text": "已读",
+        "iconPath": "images/tab-finished.png",
+        "selectedIconPath": "images/tab-finished-active.png"
+      },
+      {
+        "pagePath": "pages/wishlist/wishlist",
+        "text": "愿望单",
+        "iconPath": "images/tab-wishlist.png",
+        "selectedIconPath": "images/tab-wishlist-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/tab-profile.png",
+        "selectedIconPath": "images/tab-profile-active.png"
+      }
+    ]
   },
   "style": "v2",
   "componentFramework": "glass-easel",

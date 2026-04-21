@@ -1,8 +1,8 @@
-<!-- pages/index/index.wxml -->
+<!-- pages/wishlist/wishlist.wxml -->
 <view class="page-container">
   <!-- 页面标题和添加按钮 -->
   <view class="page-header">
-    <text class="page-title">在读书籍</text>
+    <text class="page-title">愿望单</text>
     <view class="add-button" bindtap="showAddModal">
       <text class="add-icon">+</text>
     </view>
@@ -14,10 +14,10 @@
   </view>
 
   <!-- 空状态 -->
-  <view wx:elif="{{readingBooks.length === 0}}" class="empty-container">
+  <view wx:elif="{{wishBooks.length === 0}}" class="empty-container">
     <text class="empty-icon">📚</text>
-    <text class="empty-text">还没有在读书籍</text>
-    <text class="empty-subtext">添加你的第一本书开始阅读吧</text>
+    <text class="empty-text">还没有愿望单书籍</text>
+    <text class="empty-subtext">添加你想读的书籍到愿望单</text>
     <view class="empty-button" bindtap="showAddModal">
       <text>添加第一本书</text>
     </view>
@@ -25,96 +25,33 @@
 
   <!-- 书籍列表 -->
   <scroll-view wx:else class="book-list" scroll-y>
-    <view wx:for="{{readingBooks}}" wx:for-item="book" wx:key="id" class="book-card">
+    <view wx:for="{{wishBooks}}" wx:key="id" class="book-card">
       <!-- 书籍信息 -->
       <view class="book-info">
         <view class="book-header">
-          <text class="book-title">{{book.title}}</text>
-          <view class="more-btn" bindtap="showMoreMenu" data-bookid="{{book.id}}">
+          <text class="book-title">{{item.title}}</text>
+          <view class="more-btn" bindtap="showMoreMenu" data-bookid="{{item.id}}">
             <text class="more-icon">⋯</text>
           </view>
         </view>
-        <text wx:if="{{book.author}}" class="book-author">{{book.author}}</text>
-        
-        <!-- 进度显示 -->
-        <view class="progress-info" bindtap="showProgressPicker" data-bookid="{{book.id}}">
-          <text wx:if="{{book.totalPages > 0}}" class="progress-text">{{book.currentPage}}/{{book.totalPages}} 页</text>
-          <text class="progress-percent">{{book.progressPercent}}%</text>
-        </view>
+        <text wx:if="{{item.author}}" class="book-author">{{item.author}}</text>
       </view>
-
-      <!-- 分段式进度块 -->
-      <view class="progress-blocks-wrap">
-        <view class="progress-blocks">
-          <view
-            wx:for="{{5}}"
-            wx:for-index="i"
-            wx:key="i"
-            class="progress-block {{i < book.progressBlockCount ? 'active' : ''}}"
-            hover-class="progress-block-tap"
-            bindtap="onProgressBlockTap"
-            data-bookid="{{book.id}}"
-            data-index="{{i}}"
-          />
-        </view>
-        <text class="progress-hint">点击方块调节进度</text>
-      </view>
-
+      
       <!-- 操作按钮 -->
       <view class="book-actions">
-        <view class="btn btn-primary" bindtap="markAsFinished" data-bookid="{{book.id}}">
-          <text>读完</text>
+        <view class="btn btn-primary" bindtap="startReading" data-bookid="{{item.id}}">
+          <text>开始读</text>
         </view>
       </view>
     </view>
   </scroll-view>
-
-  <!-- 进度调节弹窗 -->
-  <view wx:if="{{showProgressModal}}" class="modal-overlay" bindtap="hideProgressModal">
-    <view class="modal-content" catchtap="stopPropagation">
-      <view class="modal-header">
-        <text class="modal-title">调节进度</text>
-        <view class="modal-close" bindtap="hideProgressModal">
-          <text>×</text>
-        </view>
-      </view>
-      <view class="modal-body">
-        <view class="progress-display">
-          <text class="progress-big">{{tempProgress}}%</text>
-        </view>
-        <slider 
-          value="{{tempProgress}}"
-          activeColor="#2563eb"
-          backgroundColor="#e8e8e8"
-          block-size="24"
-          show-value="{{false}}"
-          bindchange="onProgressSliderChange"
-        />
-        <view class="progress-quick-btns">
-          <view class="btn btn-secondary" bindtap="setQuickProgress" data-value="0">0%</view>
-          <view class="btn btn-secondary" bindtap="setQuickProgress" data-value="25">25%</view>
-          <view class="btn btn-secondary" bindtap="setQuickProgress" data-value="50">50%</view>
-          <view class="btn btn-secondary" bindtap="setQuickProgress" data-value="75">75%</view>
-          <view class="btn btn-secondary" bindtap="setQuickProgress" data-value="100">100%</view>
-        </view>
-      </view>
-      <view class="modal-footer">
-        <view class="btn btn-secondary" bindtap="hideProgressModal">
-          <text>取消</text>
-        </view>
-        <view class="btn btn-primary" bindtap="confirmProgress">
-          <text>确定</text>
-        </view>
-      </view>
-    </view>
-  </view>
 
   <!-- 添加书籍弹窗 -->
   <view wx:if="{{showAddModal}}" class="modal-overlay" bindtap="hideAddModal">
     <view class="modal-content" catchtap="stopPropagation">
       <!-- 弹窗标题 -->
       <view class="modal-header">
-        <text class="modal-title">添加新书</text>
+        <text class="modal-title">添加到愿望单</text>
         <view class="modal-close" bindtap="hideAddModal">
           <text>×</text>
         </view>
