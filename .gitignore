@@ -1,0 +1,8 @@
+# 微信开发者工具生成的文件
+.DS_Store
+*.log
+node_modules/
+miniprogram_npm/
+
+# 微信小程序本地配置（包含个人 AppID 等敏感信息）
+project.private.config.json
