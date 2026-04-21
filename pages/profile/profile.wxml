@@ -7,7 +7,7 @@
     </view>
     <view class="user-info">
       <open-data type="userNickName" class="user-nickname"></open-data>
-      <text class="user-welcome">欢迎使用读书助手</text>
+      <text class="user-welcome">欢迎使用{{appName}}</text>
     </view>
   </view>
 
