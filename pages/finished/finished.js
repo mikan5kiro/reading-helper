@@ -4,6 +4,7 @@ const app = getApp();
 Page({
   data: {
     groupedBooks: [],
+    totalCount: 0,
     isLoading: false,
     showMoreMenu: false,
     showEditModal: false,
@@ -32,15 +33,18 @@ Page({
       try {
         const finishedBooks = app.getBooksByStatus('finished');
         const groupedBooks = this.groupBooksByMonth(finishedBooks);
+        const totalCount = finishedBooks ? finishedBooks.length : 0;
         
         this.setData({
           groupedBooks: groupedBooks || [],
+          totalCount: totalCount,
           isLoading: false
         });
       } catch (error) {
         console.error('加载已读书籍失败:', error);
         this.setData({ 
           groupedBooks: [],
+          totalCount: 0,
           isLoading: false 
         });
       }

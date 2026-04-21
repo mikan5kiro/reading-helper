@@ -20,21 +20,37 @@
   border-bottom: 1px solid #e8e8e8;
 }
 
+.page-title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
 .page-title {
   font-size: 20px;
   font-weight: 600;
   color: #333333;
 }
 
+.page-count {
+  font-size: 14px;
+  color: #8a8a8a;
+}
+
 /* 添加按钮 */
 .add-button {
-  width: 40px;
-  height: 40px;
+  position: fixed;
+  bottom: 120px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background-color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .add-icon {

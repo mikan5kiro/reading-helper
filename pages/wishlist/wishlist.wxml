@@ -1,11 +1,16 @@
 <!-- pages/wishlist/wishlist.wxml -->
 <view class="page-container">
-  <!-- 页面标题和添加按钮 -->
+  <!-- 页面标题 -->
   <view class="page-header">
-    <text class="page-title">愿望单</text>
-    <view class="add-button" bindtap="showAddModal">
-      <text class="add-icon">+</text>
+    <view class="page-title-wrap">
+      <text class="page-title">愿望单</text>
+      <text wx:if="{{wishlistBooks.length > 0}}" class="page-count">{{wishlistBooks.length}} 本</text>
     </view>
+  </view>
+
+  <!-- 固定添加按钮 -->
+  <view wx:if="{{wishlistBooks.length > 0}}" class="add-button" bindtap="showAddModal">
+    <text class="add-icon">+</text>
   </view>
 
   <!-- 加载状态 -->
