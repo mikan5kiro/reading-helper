@@ -1,5 +1,6 @@
 // pages/index/index.js
 const app = getApp();
+const { CATEGORIES, calculateReadingDays, getTodayString } = require('../../utils/common.js');
 
 Page({
   data: {
@@ -9,7 +10,7 @@ Page({
     showMoreMenu: false,
     showEditModal: false,
     currentBookId: '',
-    categories: ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'],
+    categories: CATEGORIES,
     categoryIndex: -1,
     formData: {
       title: '',
@@ -65,13 +66,7 @@ Page({
         const progressBlockCount = Math.ceil(progressPercent / 20);
         
         // 计算已读天数
-        let daysReading = 0;
-        if (book.startDate) {
-          const startDate = new Date(book.startDate);
-          const today = new Date();
-          const diffTime = Math.abs(today - startDate);
-          daysReading = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }
+        const daysReading = calculateReadingDays(book.startDate);
         
         return {
           ...book,
@@ -98,11 +93,7 @@ Page({
 
   showAddModal() {
     // 获取今天的日期作为默认值
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const defaultDate = `${year}-${month}-${day}`;
+    const defaultDate = getTodayString();
     
     this.setData({
       showAddModal: true,

@@ -1,5 +1,6 @@
 // pages/finished/finished.js
 const app = getApp();
+const { CATEGORIES, formatFinishedDate, groupBooksByMonth, getTodayString } = require('../../utils/common.js');
 
 Page({
   data: {
@@ -10,7 +11,7 @@ Page({
     showEditModal: false,
     showAddModal: false,
     currentBookId: '',
-    categories: ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'],
+    categories: CATEGORIES,
     categoryIndex: -1,
     editCategoryIndex: -1,
     formData: {
@@ -39,7 +40,7 @@ Page({
       const sortedBooks = (finishedBooks || []).sort((a, b) => (b.finishedAt || 0) - (a.finishedAt || 0));
       
       // 按月份分组
-      const groupedBooks = this.groupBooksByMonth(sortedBooks);
+      const groupedBooks = groupBooksByMonth(sortedBooks, formatFinishedDate);
       
       this.setData({
         groupedBooks,
@@ -56,53 +57,6 @@ Page({
     }
   },
 
-  groupBooksByMonth(books) {
-    if (!books || books.length === 0) {
-      return [];
-    }
-    
-    const sortedBooks = books.sort((a, b) => (b.finishedAt || 0) - (a.finishedAt || 0));
-    
-    const groups = {};
-    
-    sortedBooks.forEach(book => {
-      let monthKey = '未设置时间';
-      let finishedDateStr = '未设置时间';
-      
-      if (book.finishedAt) {
-        const date = new Date(book.finishedAt);
-        monthKey = `${date.getFullYear()}年${date.getMonth() + 1}月`;
-        finishedDateStr = this.formatFinishedDate(book.finishedAt);
-      }
-      
-      if (!groups[monthKey]) {
-        groups[monthKey] = {
-          month: monthKey,
-          books: []
-        };
-      }
-      
-      const formattedBook = {
-        ...book,
-        finishedDateStr: finishedDateStr
-      };
-      
-      groups[monthKey].books.push(formattedBook);
-    });
-    
-    return Object.values(groups);
-  },
-
-  formatFinishedDate(timestamp) {
-    if (!timestamp) return '';
-    
-    const date = new Date(timestamp);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    
-    return `${month}月${day}日读完`;
-  },
-
   showMoreMenu(e) {
     const { bookid } = e.currentTarget.dataset;
     this.setData({
@@ -115,25 +69,6 @@ Page({
     this.setData({
       showMoreMenu: false
     });
-  },
-
-  editBook() {
-    const bookid = this.data.currentBookId;
-    const book = app.globalData.books.find(b => b.id === bookid);
-    
-    if (book) {
-      const categoryIndex = this.data.categories.findIndex(c => c === book.category);
-      this.setData({
-        formData: {
-          title: book.title,
-          author: book.author || '',
-          category: book.category || ''
-        },
-        editCategoryIndex: categoryIndex >= 0 ? categoryIndex : -1,
-        showMoreMenu: false,
-        showEditModal: true
-      });
-    }
   },
 
   onEditCategoryChange(e) {
@@ -165,32 +100,6 @@ Page({
     });
   },
 
-  submitEditForm() {
-    const { title, author, category } = this.data.formData;
-    const bookid = this.data.currentBookId;
-    
-    if (!title.trim()) {
-      wx.showToast({
-        title: '请输入书名',
-        icon: 'none'
-      });
-      return;
-    }
-    
-    app.updateBook(bookid, {
-      title: title.trim(),
-      author: author.trim(),
-      category: category || ''
-    });
-    
-    this.loadFinishedBooks();
-    this.setData({ showEditModal: false });
-    wx.showToast({
-      title: '编辑成功',
-      icon: 'success'
-    });
-  },
-
   hideEditModal() {
     this.setData({ showEditModal: false });
   },
@@ -209,11 +118,7 @@ Page({
   },
 
   showAddModal() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${year}-${month}-${day}`;
+    const todayStr = getTodayString();
     
     this.setData({
       showAddModal: true,

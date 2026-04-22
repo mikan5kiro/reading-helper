@@ -1,5 +1,6 @@
 // pages/wishlist/wishlist.js
 const app = getApp();
+const { CATEGORIES, formatDate } = require('../../utils/common.js');
 
 Page({
   data: {
@@ -9,7 +10,7 @@ Page({
     showMoreMenu: false,
     showEditModal: false,
     currentBookId: '',
-    categories: ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'],
+    categories: CATEGORIES,
     categoryIndex: -1,
     formData: {
       title: '',
@@ -34,7 +35,7 @@ Page({
       const sortedBooks = (wishBooks || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       // 添加添加日期字符串
       const booksWithDate = sortedBooks.map(book => {
-        const addDateStr = book.createdAt ? this.formatDate(book.createdAt) : '未知';
+        const addDateStr = book.createdAt ? formatDate(book.createdAt) : '未知';
         return {
           ...book,
           addDateStr
@@ -51,14 +52,6 @@ Page({
         isLoading: false
       });
     }
-  },
-
-  formatDate(timestamp) {
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
   },
 
   showAddModal() {
