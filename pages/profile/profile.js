@@ -35,9 +35,21 @@ Page({
   },
 
   onFeedback() {
-    wx.showToast({
-      title: '暂不支持',
-      icon: 'none'
+    wx.setClipboardData({
+      data: 'geronimo1028',
+      success() {
+        wx.showToast({
+          title: '微信号已复制\n可以添加开发者微信反馈',
+          icon: 'none',
+          duration: 2000
+        });
+      },
+      fail() {
+        wx.showToast({
+          title: '复制失败',
+          icon: 'none'
+        });
+      }
     });
   },
 
