@@ -32,61 +32,87 @@ Page({
   loadReadingBooks() {
     const showLoading = this.data.isLoading;
     try {
+      // 强制重新加载数据
+      app.loadBooks();
+      
       const readingBooks = app.getBooksByStatus('reading');
+      console.log('加载的在读书籍数量:', readingBooks ? readingBooks.length : 0);
       console.log('加载的在读书籍:', readingBooks);
+      
+      // 确保 readingBooks 是数组
+      const booksToProcess = Array.isArray(readingBooks) ? readingBooks : [];
       
       // 读取排序设置
       const settings = wx.getStorageSync('readingHelperSettings');
       const sortByStartDate = settings ? settings.sortByStartDate !== false : true;
       
       // 根据设置决定排序方式
-      const sortedBooks = (readingBooks || []).sort((a, b) => {
-        if (sortByStartDate) {
-          // 按开始阅读时间降序排序，开始读得晚的排在上面
-          // 如果开始阅读时间相同，按添加时间降序排序，新添加的排在上面
-          const dateA = a.startDate || '';
-          const dateB = b.startDate || '';
-          if (dateA && dateB) {
-            const dateComparison = dateB.localeCompare(dateA);
-            if (dateComparison !== 0) return dateComparison;
-            // 开始阅读时间相同，按添加时间排序
+      const sortedBooks = booksToProcess.sort((a, b) => {
+        try {
+          if (sortByStartDate) {
+            // 按开始阅读时间降序排序，开始读得晚的排在上面
+            // 如果开始阅读时间相同，按添加时间降序排序，新添加的排在上面
+            const dateA = a.startDate || '';
+            const dateB = b.startDate || '';
+            if (dateA && dateB) {
+              const dateComparison = dateB.localeCompare(dateA);
+              if (dateComparison !== 0) return dateComparison;
+              // 开始阅读时间相同，按添加时间排序
+              return (b.createdAt || 0) - (a.createdAt || 0);
+            }
+            if (dateA) return -1;
+            if (dateB) return 1;
+            return (b.createdAt || 0) - (a.createdAt || 0);
+          } else {
+            // 按添加时间降序排序，新添加的排在上面
             return (b.createdAt || 0) - (a.createdAt || 0);
           }
-          if (dateA) return -1;
-          if (dateB) return 1;
-          return (b.createdAt || 0) - (a.createdAt || 0);
-        } else {
-          // 按添加时间降序排序，新添加的排在上面
-          return (b.createdAt || 0) - (a.createdAt || 0);
+        } catch (sortError) {
+          console.error('排序错误:', sortError);
+          return 0;
         }
       });
       
       const formattedBooks = sortedBooks.map(book => {
-        let progressPercent = 0;
-        if (book.totalPages > 0) {
-          progressPercent = Math.round((book.currentPage / book.totalPages) * 100);
-        } else if (book.progress !== undefined) {
-          progressPercent = book.progress;
+        try {
+          let progressPercent = 0;
+          if (book.totalPages > 0) {
+            progressPercent = Math.round((book.currentPage / book.totalPages) * 100);
+          } else if (book.progress !== undefined) {
+            progressPercent = book.progress;
+          }
+          const progressBlockCount = Math.ceil(progressPercent / 20);
+          
+          // 计算已读天数
+          let daysReading = 0;
+          if (book.startDate) {
+            try {
+              const startDate = new Date(book.startDate);
+              if (!isNaN(startDate.getTime())) {
+                const today = new Date();
+                const diffTime = Math.abs(today - startDate);
+                daysReading = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              }
+            } catch (dateError) {
+              console.error('日期计算错误:', dateError);
+              daysReading = 0;
+            }
+          }
+          
+          return {
+            ...book,
+            progressPercent,
+            progressBlockCount,
+            daysReading
+          };
+        } catch (formatError) {
+          console.error('格式化书籍错误:', formatError);
+          // 返回原始书籍数据，确保不会因为单个书籍错误影响整个列表
+          return book;
         }
-        const progressBlockCount = Math.ceil(progressPercent / 20);
-        
-        // 计算已读天数
-        let daysReading = 0;
-        if (book.startDate) {
-          const startDate = new Date(book.startDate);
-          const today = new Date();
-          const diffTime = Math.abs(today - startDate);
-          daysReading = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }
-        
-        return {
-          ...book,
-          progressPercent,
-          progressBlockCount,
-          daysReading
-        };
       });
       
+      console.log('格式化后的书籍数据数量:', formattedBooks.length);
       console.log('格式化后的书籍数据:', formattedBooks);
       
       this.setData({
@@ -95,10 +121,22 @@ Page({
       });
     } catch (error) {
       console.error('加载在读书籍失败:', error);
-      this.setData({ 
-        readingBooks: [],
-        isLoading: false
-      });
+      // 即使出错也尝试获取原始数据
+      try {
+        app.loadBooks();
+        const readingBooks = app.getBooksByStatus('reading');
+        const booksToShow = Array.isArray(readingBooks) ? readingBooks : [];
+        this.setData({ 
+          readingBooks: booksToShow,
+          isLoading: false
+        });
+      } catch (fallbackError) {
+        console.error('备用方案也失败:', fallbackError);
+        this.setData({ 
+          readingBooks: [],
+          isLoading: false
+        });
+      }
     }
   },
 
