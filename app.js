@@ -66,6 +66,7 @@ App({
     if (index !== -1) {
       this.globalData.books[index] = { ...this.globalData.books[index], ...updates };
       this.saveBooks();
+      this.globalData.dataUpdated = true; // 标记数据已更新
       console.log('更新书籍成功:', this.globalData.books[index]);
       return true;
     }
@@ -99,9 +100,13 @@ App({
   },
 
   startReading(bookId) {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
+    
     return this.updateBook(bookId, {
       status: 'reading',
-      currentPage: 0
+      currentPage: 0,
+      startDate: formattedDate
     });
   },
 

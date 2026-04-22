@@ -13,8 +13,13 @@
     <text class="add-icon">+</text>
   </view>
 
+  <!-- 加载状态 -->
+  <view wx:if="{{isLoading}}" class="loading-container">
+    <text class="loading-text">加载中...</text>
+  </view>
+
   <!-- 空状态 -->
-  <view wx:if="{{groupedBooks.length === 0}}" class="empty-container">
+  <view wx:elif="{{groupedBooks.length === 0}}" class="empty-container">
     <text class="empty-icon">📖</text>
     <text class="empty-text">还没有已读书籍</text>
     <text class="empty-subtext">添加您读过的书籍</text>

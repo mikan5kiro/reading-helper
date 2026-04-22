@@ -1,90 +1,239 @@
 // pages/wishlist/wishlist.js
 const app = getApp();
-const { PageBase } = require('../../utils/pageBase.js');
-const { BookService, BookActionService } = require('../../service/bookService.js');
 
 Page({
   data: {
-    wishBooks: []
+    wishBooks: [],
+    isLoading: false,
+    showAddModal: false,
+    showMoreMenu: false,
+    showEditModal: false,
+    currentBookId: '',
+    categories: ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'],
+    categoryIndex: -1,
+    formData: {
+      title: '',
+      author: '',
+      category: ''
+    }
   },
 
   onLoad() {
-    this.pageBase = new PageBase(this);
-    this.loadData();
+    this.setData({ isLoading: true });
+    this.loadWishBooks();
   },
 
   onShow() {
-    this.loadData();
-  },
-
-  loadData() {
     this.loadWishBooks();
   },
 
   loadWishBooks() {
-    this.pageBase.loadBooksByStatus('wish', (books) => {
-      const wishBooks = BookService.processWishBooks(books);
-      this.setData({ wishBooks });
+    try {
+      const wishBooks = app.getBooksByStatus('wish');
+      // 按创建时间降序排序，新添加的书籍排在前面
+      const sortedBooks = (wishBooks || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      // 添加添加日期字符串
+      const booksWithDate = sortedBooks.map(book => {
+        const addDateStr = book.createdAt ? this.formatDate(book.createdAt) : '未知';
+        return {
+          ...book,
+          addDateStr
+        };
+      });
+      this.setData({
+        wishBooks: booksWithDate,
+        isLoading: false
+      });
+    } catch (error) {
+      console.error('加载愿望单书籍失败:', error);
+      this.setData({ 
+        wishBooks: [],
+        isLoading: false
+      });
+    }
+  },
+
+  formatDate(timestamp) {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
+
+  showAddModal() {
+    this.setData({
+      showAddModal: true,
+      categoryIndex: -1,
+      formData: {
+        title: '',
+        author: '',
+        category: ''
+      }
+    });
+  },
+
+  onCategoryChange(e) {
+    const index = e.detail.value;
+    const category = this.data.categories[index];
+    this.setData({
+      categoryIndex: index,
+      'formData.category': category
+    });
+  },
+
+  hideAddModal() {
+    this.setData({ showAddModal: false });
+  },
+
+  stopPropagation() {
+    // 阻止事件冒泡
+  },
+
+  onFormInput(e) {
+    const { field } = e.currentTarget.dataset;
+    const { value } = e.detail;
+    this.setData({
+      [`formData.${field}`]: value
+    });
+  },
+
+  submitForm() {
+    const { title, author, category } = this.data.formData;
+    
+    if (!title.trim()) {
+      wx.showToast({
+        title: '请输入书名',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    const bookData = {
+      title: title.trim(),
+      author: author.trim(),
+      category: category || '',
+      status: 'wish'
+    };
+    
+    app.addBook(bookData);
+    this.loadWishBooks();
+    this.hideAddModal();
+    
+    wx.showToast({
+      title: '添加成功',
+      icon: 'success'
     });
   },
 
   startReading(e) {
     const { bookid } = e.currentTarget.dataset;
+    
     wx.showModal({
       title: '确认',
       content: '确定要开始阅读这本书吗？',
       success: (res) => {
         if (res.confirm) {
-          BookActionService.startReading(bookid);
+          app.startReading(bookid);
           this.loadWishBooks();
-          wx.showToast({ title: '已添加到在读书籍', icon: 'success' });
+          wx.showToast({
+            title: '已添加到在读书籍',
+            icon: 'success'
+          });
         }
       }
+    });
+  },
+
+  showMoreMenu(e) {
+    const { bookid } = e.currentTarget.dataset;
+    this.setData({
+      currentBookId: bookid,
+      showMoreMenu: true
+    });
+  },
+
+  hideMoreMenu() {
+    this.setData({
+      showMoreMenu: false
     });
   },
 
   editBook() {
     const bookid = this.data.currentBookId;
     const book = app.globalData.books.find(b => b.id === bookid);
+    
     if (book) {
-      this.pageBase.showEditModal(book);
-      this.setData({ showMoreMenu: false });
+      const categoryIndex = this.data.categories.findIndex(c => c === book.category);
+      this.setData({
+        formData: {
+          title: book.title,
+          author: book.author || '',
+          category: book.category || ''
+        },
+        editCategoryIndex: categoryIndex >= 0 ? categoryIndex : -1,
+        showMoreMenu: false,
+        showEditModal: true
+      });
     }
   },
 
-  submitForm() {
-    const { title, author, category } = this.data.formData;
-    if (!title.trim()) {
-      wx.showToast({ title: '请输入书名', icon: 'none' });
-      return;
-    }
-    const result = BookActionService.addBook({
-      title,
-      author,
-      category,
-      status: 'wish'
+  onEditCategoryChange(e) {
+    const index = e.detail.value;
+    const category = this.data.categories[index];
+    this.setData({
+      editCategoryIndex: index,
+      'formData.category': category
     });
-    if (result.success) {
-      this.loadWishBooks();
-      this.hideAddModal();
-      wx.showToast({ title: '添加成功', icon: 'success' });
-    }
+  },
+
+  deleteBook() {
+    const bookid = this.data.currentBookId;
+    
+    wx.showModal({
+      title: '确认',
+      content: '确定要删除这本书吗？',
+      success: (res) => {
+        if (res.confirm) {
+          app.deleteBook(bookid);
+          this.loadWishBooks();
+          this.setData({ showMoreMenu: false });
+          wx.showToast({
+            title: '删除成功',
+            icon: 'success'
+          });
+        }
+      }
+    });
   },
 
   submitEditForm() {
     const { title, author, category } = this.data.formData;
     const bookid = this.data.currentBookId;
+    
     if (!title.trim()) {
-      wx.showToast({ title: '请输入书名', icon: 'none' });
+      wx.showToast({
+        title: '请输入书名',
+        icon: 'none'
+      });
       return;
     }
-    BookActionService.updateBook(bookid, {
+    
+    app.updateBook(bookid, {
       title: title.trim(),
       author: author.trim(),
       category: category || ''
     });
+    
     this.loadWishBooks();
     this.setData({ showEditModal: false });
-    wx.showToast({ title: '编辑成功', icon: 'success' });
+    wx.showToast({
+      title: '编辑成功',
+      icon: 'success'
+    });
+  },
+
+  hideEditModal() {
+    this.setData({ showEditModal: false });
   }
 });
