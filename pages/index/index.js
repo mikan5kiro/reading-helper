@@ -35,14 +35,24 @@ Page({
       const readingBooks = app.getBooksByStatus('reading');
       console.log('加载的在读书籍:', readingBooks);
       
-      // 按开始阅读时间降序排序，开始读得晚的排在上面
+      // 读取排序设置
+      const settings = wx.getStorageSync('readingHelperSettings');
+      const sortByStartDate = settings ? settings.sortByStartDate !== false : true;
+      
+      // 根据设置决定排序方式
       const sortedBooks = (readingBooks || []).sort((a, b) => {
-        const dateA = a.startDate || '';
-        const dateB = b.startDate || '';
-        if (dateA && dateB) return dateB.localeCompare(dateA);
-        if (dateA) return -1;
-        if (dateB) return 1;
-        return (b.createdAt || 0) - (a.createdAt || 0);
+        if (sortByStartDate) {
+          // 按开始阅读时间降序排序，开始读得晚的排在上面
+          const dateA = a.startDate || '';
+          const dateB = b.startDate || '';
+          if (dateA && dateB) return dateB.localeCompare(dateA);
+          if (dateA) return -1;
+          if (dateB) return 1;
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        } else {
+          // 按添加时间降序排序，新添加的排在上面
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        }
       });
       
       const formattedBooks = sortedBooks.map(book => {

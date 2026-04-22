@@ -1,0 +1,67 @@
+/* pages/settings/settings.wxss */
+.page-container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 20rpx;
+}
+
+.page-header {
+  background-color: #fff;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #e5e5e5;
+  margin-bottom: 20rpx;
+}
+
+.page-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.settings-section {
+  background-color: #fff;
+  border-radius: 12rpx;
+  margin: 0 30rpx 20rpx;
+  overflow: hidden;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.setting-left {
+  flex: 1;
+}
+
+.setting-text {
+  font-size: 30rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.setting-desc {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.4;
+}
+
+.setting-right {
+  margin-left: 20rpx;
+}
+
+.setting-hint {
+  padding: 16rpx 30rpx 24rpx;
+  background-color: #f9f9f9;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.hint-text {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.4;
+}

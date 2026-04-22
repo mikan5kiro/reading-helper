@@ -1,0 +1,29 @@
+<!-- pages/settings/settings.wxml -->
+<view class="page-container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">设置</text>
+  </view>
+
+  <!-- 设置列表 -->
+  <view class="settings-section">
+    <!-- 排序设置 -->
+    <view class="setting-item">
+      <view class="setting-left">
+        <text class="setting-text">在读页面排序方式</text>
+        <text class="setting-desc">控制在读书籍的排序顺序</text>
+      </view>
+      <view class="setting-right">
+        <switch 
+          checked="{{sortByStartDate}}" 
+          bindchange="onSortChange" 
+          color="var(--color-primary)"
+        />
+      </view>
+    </view>
+    <view class="setting-hint">
+      <text wx:if="{{sortByStartDate}}" class="hint-text">按开始阅读时间排序（新开始的排在前面）</text>
+      <text wx:else class="hint-text">按添加时间排序（新添加的排在前面）</text>
+    </view>
+  </view>
+</view>

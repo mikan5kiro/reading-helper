@@ -48,5 +48,11 @@ Page({
       showCancel: false,
       confirmText: '我知道了'
     });
+  },
+
+  onSettings() {
+    wx.navigateTo({
+      url: '/pages/settings/settings'
+    });
   }
 });
