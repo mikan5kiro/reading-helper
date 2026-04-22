@@ -25,33 +25,44 @@ Page({
     this.loadFinishedBooks();
   },
 
-  onShow() {
+  onLoad() {
+    // 页面加载时初始化数据
     this.loadFinishedBooks();
+  },
+
+  onShow() {
+    // 只在数据更新时才重新加载
+    if (app.checkDataUpdated()) {
+      this.loadFinishedBooks();
+    }
   },
 
   loadFinishedBooks() {
     this.setData({ isLoading: true });
     
-    setTimeout(() => {
-      try {
-        const finishedBooks = app.getBooksByStatus('finished');
-        const groupedBooks = this.groupBooksByMonth(finishedBooks);
-        const totalCount = finishedBooks ? finishedBooks.length : 0;
-        
-        this.setData({
-          groupedBooks: groupedBooks || [],
-          totalCount: totalCount,
-          isLoading: false
-        });
-      } catch (error) {
-        console.error('加载已读书籍失败:', error);
-        this.setData({ 
-          groupedBooks: [],
-          totalCount: 0,
-          isLoading: false 
-        });
-      }
-    }, 300);
+    try {
+      const finishedBooks = app.getBooksByStatus('finished');
+      console.log('加载的已读书籍:', finishedBooks);
+      
+      // 按完成时间降序排序
+      const sortedBooks = (finishedBooks || []).sort((a, b) => (b.finishedAt || 0) - (a.finishedAt || 0));
+      
+      // 按月份分组
+      const groupedBooks = this.groupBooksByMonth(sortedBooks);
+      
+      this.setData({
+        groupedBooks,
+        totalCount: finishedBooks.length,
+        isLoading: false
+      });
+    } catch (error) {
+      console.error('加载已读书籍失败:', error);
+      this.setData({ 
+        groupedBooks: [],
+        totalCount: 0,
+        isLoading: false 
+      });
+    }
   },
 
   groupBooksByMonth(books) {

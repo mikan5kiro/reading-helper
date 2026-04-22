@@ -22,38 +22,44 @@ Page({
     this.loadWishBooks();
   },
 
-  onShow() {
+  onLoad() {
+    // 页面加载时初始化数据
     this.loadWishBooks();
+  },
+
+  onShow() {
+    // 只在数据更新时才重新加载
+    if (app.checkDataUpdated()) {
+      this.loadWishBooks();
+    }
   },
 
   loadWishBooks() {
     this.setData({ isLoading: true });
     
-    setTimeout(() => {
-      try {
-        const wishBooks = app.getBooksByStatus('wish');
-        // 按创建时间降序排序，新添加的书籍排在前面
-        const sortedBooks = (wishBooks || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        // 添加添加日期字符串
-        const booksWithDate = sortedBooks.map(book => {
-          const addDateStr = book.createdAt ? this.formatDate(book.createdAt) : '未知';
-          return {
-            ...book,
-            addDateStr
-          };
-        });
-        this.setData({
-          wishBooks: booksWithDate,
-          isLoading: false
-        });
-      } catch (error) {
-        console.error('加载愿望单书籍失败:', error);
-        this.setData({ 
-          wishBooks: [],
-          isLoading: false 
-        });
-      }
-    }, 300);
+    try {
+      const wishBooks = app.getBooksByStatus('wish');
+      // 按创建时间降序排序，新添加的书籍排在前面
+      const sortedBooks = (wishBooks || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      // 添加添加日期字符串
+      const booksWithDate = sortedBooks.map(book => {
+        const addDateStr = book.createdAt ? this.formatDate(book.createdAt) : '未知';
+        return {
+          ...book,
+          addDateStr
+        };
+      });
+      this.setData({
+        wishBooks: booksWithDate,
+        isLoading: false
+      });
+    } catch (error) {
+      console.error('加载愿望单书籍失败:', error);
+      this.setData({ 
+        wishBooks: [],
+        isLoading: false 
+      });
+    }
   },
 
   formatDate(timestamp) {

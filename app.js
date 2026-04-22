@@ -1,7 +1,8 @@
 // app.js
 App({
   globalData: {
-    books: []
+    books: [],
+    dataUpdated: false // 数据更新标记
   },
 
   onLaunch() {
@@ -25,10 +26,20 @@ App({
   saveBooks() {
     try {
       wx.setStorageSync('books', this.globalData.books);
+      this.globalData.dataUpdated = true; // 标记数据已更新
       console.log('保存书籍数据成功:', this.globalData.books.length, '本书籍');
     } catch (error) {
       console.error('保存书籍数据失败:', error);
     }
+  },
+
+  // 检查数据是否需要重新加载
+  checkDataUpdated() {
+    const updated = this.globalData.dataUpdated;
+    if (updated) {
+      this.globalData.dataUpdated = false; // 重置标记
+    }
+    return updated;
   },
 
   addBook(bookData) {

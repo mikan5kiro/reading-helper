@@ -23,15 +23,24 @@ Page({
     this.loadReadingBooks();
   },
 
-  onShow() {
+  onLoad() {
+    // 页面加载时初始化数据
     app.loadBooks();
     this.loadReadingBooks();
+  },
+
+  onShow() {
+    // 只在数据更新时才重新加载
+    if (app.checkDataUpdated()) {
+      app.loadBooks();
+      this.loadReadingBooks();
+    }
   },
 
   loadReadingBooks() {
     this.setData({ isLoading: true });
     
-    setTimeout(() => {
+    try {
       const readingBooks = app.getBooksByStatus('reading');
       console.log('加载的在读书籍:', readingBooks);
       
@@ -70,7 +79,13 @@ Page({
         readingBooks: formattedBooks,
         isLoading: false
       });
-    }, 300);
+    } catch (error) {
+      console.error('加载在读书籍失败:', error);
+      this.setData({ 
+        readingBooks: [],
+        isLoading: false 
+      });
+    }
   },
 
   showAddModal() {
