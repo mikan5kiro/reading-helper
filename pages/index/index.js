@@ -23,29 +23,25 @@ Page({
     this.loadReadingBooks();
   },
 
-  onLoad() {
-    // 页面加载时初始化数据
+  onShow() {
     app.loadBooks();
     this.loadReadingBooks();
   },
 
-  onShow() {
-    // 只在数据更新时才重新加载
-    if (app.checkDataUpdated()) {
-      app.loadBooks();
-      this.loadReadingBooks();
-    }
-  },
-
   loadReadingBooks() {
-    this.setData({ isLoading: true });
-    
     try {
       const readingBooks = app.getBooksByStatus('reading');
       console.log('加载的在读书籍:', readingBooks);
       
-      // 按创建时间降序排序，新添加的书籍排在前面
-      const sortedBooks = (readingBooks || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      // 按开始阅读时间降序排序，开始读得晚的排在上面
+      const sortedBooks = (readingBooks || []).sort((a, b) => {
+        const dateA = a.startDate || '';
+        const dateB = b.startDate || '';
+        if (dateA && dateB) return dateB.localeCompare(dateA);
+        if (dateA) return -1;
+        if (dateB) return 1;
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
       
       const formattedBooks = sortedBooks.map(book => {
         let progressPercent = 0;
@@ -76,14 +72,12 @@ Page({
       console.log('格式化后的书籍数据:', formattedBooks);
       
       this.setData({
-        readingBooks: formattedBooks,
-        isLoading: false
+        readingBooks: formattedBooks
       });
     } catch (error) {
       console.error('加载在读书籍失败:', error);
       this.setData({ 
-        readingBooks: [],
-        isLoading: false 
+        readingBooks: []
       });
     }
   },
