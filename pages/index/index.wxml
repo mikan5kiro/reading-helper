@@ -63,7 +63,7 @@
             data-index="{{i}}"
           />
         </view>
-        <text class="progress-hint">点击方块调节进度</text>
+        <text class="progress-hint">快速调节：点击方块 | 精细调节：点击百分号</text>
       </view>
 
       <!-- 操作按钮和已读天数 -->
