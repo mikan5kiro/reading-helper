@@ -36,11 +36,13 @@ App({
       id: Date.now().toString(),
       title: bookData.title,
       author: bookData.author || '',
+      category: bookData.category || '',
       totalPages: bookData.totalPages || 0,
       currentPage: 0,
       status: bookData.status || 'reading',
       createdAt: Date.now(),
-      finishedAt: null
+      finishedAt: bookData.finishedAt || null,
+      startDate: bookData.startDate || ''
     };
 
     this.globalData.books.push(newBook);

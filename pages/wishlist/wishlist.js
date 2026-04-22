@@ -9,7 +9,7 @@ Page({
     showMoreMenu: false,
     showEditModal: false,
     currentBookId: '',
-    categories: ['小说', '心理', '社会', '成功', '经济', '哲学', '其他'],
+    categories: ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'],
     categoryIndex: -1,
     formData: {
       title: '',
@@ -34,8 +34,16 @@ Page({
         const wishBooks = app.getBooksByStatus('wish');
         // 按创建时间降序排序，新添加的书籍排在前面
         const sortedBooks = (wishBooks || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        // 添加添加日期字符串
+        const booksWithDate = sortedBooks.map(book => {
+          const addDateStr = book.createdAt ? this.formatDate(book.createdAt) : '未知';
+          return {
+            ...book,
+            addDateStr
+          };
+        });
         this.setData({
-          wishBooks: sortedBooks,
+          wishBooks: booksWithDate,
           isLoading: false
         });
       } catch (error) {
@@ -46,6 +54,14 @@ Page({
         });
       }
     }, 300);
+  },
+
+  formatDate(timestamp) {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   },
 
   showAddModal() {

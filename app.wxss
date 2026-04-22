@@ -78,6 +78,19 @@ page {
   word-break: break-word;
 }
 
+/* 书籍类别 */
+.book-category {
+  font-size: 24rpx;
+  color: var(--color-text-light);
+  margin-right: var(--spacing-sm);
+  background-color: #f0f0f0;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2rpx;
+}
+
 /* 更多按钮 */
 .more-btn {
   width: 36rpx;
@@ -188,13 +201,18 @@ slider {
 
 /* 添加按钮 */
 .add-button {
-  width: 40px;
-  height: 40px;
+  position: fixed;
+  bottom: 40px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background-color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .add-icon {
@@ -214,12 +232,11 @@ slider {
 
 /* 按钮样式 */
 .btn {
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-size: 16px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 500;
   text-align: center;
-  transition: all 0.3s ease;
 }
 
 .btn-primary {
@@ -228,8 +245,8 @@ slider {
 }
 
 .btn-primary:active {
-  background-color: #245a3d;
-  transform: translateY(1px);
+  background-color: var(--color-primary);
+  opacity: 0.8;
 }
 
 .btn-secondary {
@@ -239,7 +256,13 @@ slider {
 }
 
 .btn-secondary:active {
-  background-color: rgba(44, 110, 73, 0.1);
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* 书籍信息文本 */
+.book-info-text {
+  font-size: 12px;
+  color: #8a8a8a;
 }
 
 /* 空状态 */

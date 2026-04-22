@@ -8,6 +8,11 @@
     </view>
   </view>
 
+  <!-- 固定添加按钮 -->
+  <view wx:if="{{totalCount > 0}}" class="add-button" bindtap="showAddModal">
+    <text class="add-icon">+</text>
+  </view>
+
   <!-- 加载状态 -->
   <view wx:if="{{isLoading}}" class="loading-container">
     <text class="loading-text">加载中...</text>
@@ -17,7 +22,10 @@
   <view wx:elif="{{groupedBooks.length === 0}}" class="empty-container">
     <text class="empty-icon">📖</text>
     <text class="empty-text">还没有已读书籍</text>
-    <text class="empty-subtext">读完书籍后会显示在这里</text>
+    <text class="empty-subtext">添加您读过的书籍</text>
+    <view class="empty-button" bindtap="showAddModal">
+      <text>添加已读书籍</text>
+    </view>
   </view>
 
   <!-- 月份分组书籍列表 -->
@@ -36,6 +44,7 @@
           <view class="book-info">
             <view class="book-header">
           <text class="book-title">{{item.title}}</text>
+          <text wx:if="{{item.category}}" class="book-category">{{item.category}}</text>
           <view class="more-btn" bindtap="showMoreMenu" data-bookid="{{item.id}}">
             <text class="more-icon">⋯</text>
           </view>
@@ -54,6 +63,80 @@
     <action-sheet-item bindtap="deleteBook" color="#ff4d4f">删除</action-sheet-item>
     <action-sheet-cancel bindtap="hideMoreMenu">取消</action-sheet-cancel>
   </action-sheet>
+
+  <!-- 添加书籍弹窗 -->
+  <view wx:if="{{showAddModal}}" class="modal-overlay" bindtap="hideAddModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <!-- 弹窗标题 -->
+      <view class="modal-header">
+        <text class="modal-title">添加已读书籍</text>
+        <view class="modal-close" bindtap="hideAddModal">
+          <text>×</text>
+        </view>
+      </view>
+
+      <!-- 表单内容 -->
+      <view class="modal-body">
+        <!-- 书名 -->
+        <view class="form-group">
+          <text class="form-label">书名</text>
+          <input 
+            class="form-input" 
+            type="text" 
+            placeholder="请输入书名" 
+            value="{{formData.title}}"
+            bindinput="onFormInput"
+            data-field="title"
+          />
+        </view>
+
+        <!-- 作者 -->
+        <view class="form-group">
+          <text class="form-label">作者</text>
+          <input 
+            class="form-input" 
+            type="text" 
+            placeholder="选填" 
+            value="{{formData.author}}"
+            bindinput="onFormInput"
+            data-field="author"
+          />
+        </view>
+
+        <!-- 类别 -->
+        <view class="form-group">
+          <text class="form-label">类别</text>
+          <picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
+            <view class="form-input picker-input">
+              <text wx:if="{{formData.category}}">{{formData.category}}</text>
+              <text wx:else class="placeholder">选填</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 读完时间 -->
+        <view class="form-group">
+          <text class="form-label">读完时间</text>
+          <picker mode="date" value="{{formData.finishedDate}}" start="2000-01-01" end="2100-12-31" bindchange="onDateChange">
+            <view class="form-input picker-input">
+              <text wx:if="{{formData.finishedDate}}">{{formData.finishedDate}}</text>
+              <text wx:else class="placeholder">请选择</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <!-- 弹窗操作按钮 -->
+      <view class="modal-footer">
+        <view class="btn btn-secondary" bindtap="hideAddModal">
+          <text>取消</text>
+        </view>
+        <view class="btn btn-primary" bindtap="submitAddForm">
+          <text>添加</text>
+        </view>
+      </view>
+    </view>
+  </view>
 
   <!-- 编辑书籍弹窗 -->
   <view wx:if="{{showEditModal}}" class="modal-overlay" bindtap="hideEditModal">
@@ -101,6 +184,17 @@
             <view class="form-input picker-input">
               <text wx:if="{{formData.category}}">{{formData.category}}</text>
               <text wx:else class="placeholder">选填</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 读完时间 -->
+        <view class="form-group">
+          <text class="form-label">读完时间</text>
+          <picker mode="date" value="{{formData.finishedDate}}" start="2000-01-01" end="2100-12-31" bindchange="onDateChange">
+            <view class="form-input picker-input">
+              <text wx:if="{{formData.finishedDate}}">{{formData.finishedDate}}</text>
+              <text wx:else class="placeholder">请选择</text>
             </view>
           </picker>
         </view>

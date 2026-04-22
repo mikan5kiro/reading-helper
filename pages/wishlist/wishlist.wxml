@@ -4,12 +4,12 @@
   <view class="page-header">
     <view class="page-title-wrap">
       <text class="page-title">愿望单</text>
-      <text wx:if="{{wishlistBooks.length > 0}}" class="page-count">{{wishlistBooks.length}} 本</text>
+      <text wx:if="{{wishBooks.length > 0}}" class="page-count">{{wishBooks.length}} 本</text>
     </view>
   </view>
 
   <!-- 固定添加按钮 -->
-  <view wx:if="{{wishlistBooks.length > 0}}" class="add-button" bindtap="showAddModal">
+  <view wx:if="{{wishBooks.length > 0}}" class="add-button" bindtap="showAddModal">
     <text class="add-icon">+</text>
   </view>
 
@@ -35,6 +35,7 @@
       <view class="book-info">
         <view class="book-header">
           <text class="book-title">{{item.title}}</text>
+          <text wx:if="{{item.category}}" class="book-category">{{item.category}}</text>
           <view class="more-btn" bindtap="showMoreMenu" data-bookid="{{item.id}}">
             <text class="more-icon">⋯</text>
           </view>
@@ -42,8 +43,9 @@
         <text wx:if="{{item.author}}" class="book-author">{{item.author}}</text>
       </view>
       
-      <!-- 操作按钮 -->
+      <!-- 操作按钮和添加时间 -->
       <view class="book-actions">
+        <text class="book-info-text">添加时间：{{item.addDateStr}}</text>
         <view class="btn btn-primary" bindtap="startReading" data-bookid="{{item.id}}">
           <text>开始读</text>
         </view>

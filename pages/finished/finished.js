@@ -8,13 +8,16 @@ Page({
     isLoading: false,
     showMoreMenu: false,
     showEditModal: false,
+    showAddModal: false,
     currentBookId: '',
-    categories: ['小说', '非小说', '传记', '历史', '科技', '商业', '心理学', '哲学', '艺术', '其他'],
+    categories: ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'],
+    categoryIndex: -1,
     editCategoryIndex: -1,
     formData: {
       title: '',
       author: '',
-      category: ''
+      category: '',
+      finishedDate: ''
     }
   },
 
@@ -61,24 +64,28 @@ Page({
     const groups = {};
     
     sortedBooks.forEach(book => {
+      let monthKey = '未设置时间';
+      let finishedDateStr = '未设置时间';
+      
       if (book.finishedAt) {
         const date = new Date(book.finishedAt);
-        const monthKey = `${date.getFullYear()}年${date.getMonth() + 1}月`;
-        
-        if (!groups[monthKey]) {
-          groups[monthKey] = {
-            month: monthKey,
-            books: []
-          };
-        }
-        
-        const formattedBook = {
-          ...book,
-          finishedDateStr: this.formatFinishedDate(book.finishedAt)
-        };
-        
-        groups[monthKey].books.push(formattedBook);
+        monthKey = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+        finishedDateStr = this.formatFinishedDate(book.finishedAt);
       }
+      
+      if (!groups[monthKey]) {
+        groups[monthKey] = {
+          month: monthKey,
+          books: []
+        };
+      }
+      
+      const formattedBook = {
+        ...book,
+        finishedDateStr: finishedDateStr
+      };
+      
+      groups[monthKey].books.push(formattedBook);
     });
     
     return Object.values(groups);
@@ -197,5 +204,148 @@ Page({
 
   stopPropagation() {
     // 阻止事件冒泡
+  },
+
+  showAddModal() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
+    
+    this.setData({
+      showAddModal: true,
+      categoryIndex: -1,
+      formData: {
+        title: '',
+        author: '',
+        category: '',
+        finishedDate: todayStr
+      }
+    });
+  },
+
+  hideAddModal() {
+    this.setData({ showAddModal: false });
+  },
+
+  onCategoryChange(e) {
+    const index = e.detail.value;
+    const category = this.data.categories[index];
+    this.setData({
+      categoryIndex: index,
+      'formData.category': category
+    });
+  },
+
+  onDateChange(e) {
+    this.setData({
+      'formData.finishedDate': e.detail.value
+    });
+  },
+
+  submitAddForm() {
+    const { title, author, category, finishedDate } = this.data.formData;
+    
+    if (!title.trim()) {
+      wx.showToast({
+        title: '请输入书名',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    if (!finishedDate) {
+      wx.showToast({
+        title: '请选择读完时间',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    const finishedAt = new Date(finishedDate).getTime();
+    
+    const bookData = {
+      title: title.trim(),
+      author: author.trim(),
+      category: category || '',
+      status: 'finished',
+      finishedAt: finishedAt
+    };
+    
+    app.addBook(bookData);
+    this.loadFinishedBooks();
+    this.hideAddModal();
+    
+    wx.showToast({
+      title: '添加成功',
+      icon: 'success'
+    });
+  },
+
+  editBook() {
+    const bookid = this.data.currentBookId;
+    const book = app.globalData.books.find(b => b.id === bookid);
+    
+    if (book) {
+      const categoryIndex = this.data.categories.findIndex(c => c === book.category);
+      let finishedDate = '';
+      if (book.finishedAt) {
+        const date = new Date(book.finishedAt);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        finishedDate = `${year}-${month}-${day}`;
+      }
+      
+      this.setData({
+        formData: {
+          title: book.title,
+          author: book.author || '',
+          category: book.category || '',
+          finishedDate: finishedDate
+        },
+        editCategoryIndex: categoryIndex >= 0 ? categoryIndex : -1,
+        showMoreMenu: false,
+        showEditModal: true
+      });
+    }
+  },
+
+  submitEditForm() {
+    const { title, author, category, finishedDate } = this.data.formData;
+    const bookid = this.data.currentBookId;
+    
+    if (!title.trim()) {
+      wx.showToast({
+        title: '请输入书名',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    if (!finishedDate) {
+      wx.showToast({
+        title: '请选择读完时间',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    const finishedAt = new Date(finishedDate).getTime();
+    
+    app.updateBook(bookid, {
+      title: title.trim(),
+      author: author.trim(),
+      category: category || '',
+      finishedAt: finishedAt
+    });
+    
+    this.loadFinishedBooks();
+    this.setData({ showEditModal: false });
+    wx.showToast({
+      title: '编辑成功',
+      icon: 'success'
+    });
   }
 });

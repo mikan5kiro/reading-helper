@@ -35,6 +35,7 @@
       <view class="book-info">
         <view class="book-header">
           <text class="book-title">{{book.title}}</text>
+          <text wx:if="{{book.category}}" class="book-category">{{book.category}}</text>
           <view class="more-btn" bindtap="showMoreMenu" data-bookid="{{book.id}}">
             <text class="more-icon">⋯</text>
           </view>
@@ -65,8 +66,9 @@
         <text class="progress-hint">点击方块调节进度</text>
       </view>
 
-      <!-- 操作按钮 -->
+      <!-- 操作按钮和已读天数 -->
       <view class="book-actions">
+        <text class="book-info-text">已读 {{book.daysReading}} 天</text>
         <view class="btn btn-primary" bindtap="markAsFinished" data-bookid="{{book.id}}">
           <text>读完</text>
         </view>
@@ -164,6 +166,17 @@
           </picker>
         </view>
 
+        <!-- 开始阅读时间 -->
+        <view class="form-group">
+          <text class="form-label">开始阅读时间</text>
+          <picker mode="date" value="{{formData.startDate}}" start="2000-01-01" end="2100-12-31" bindchange="onStartDateChange">
+            <view class="form-input picker-input">
+              <text wx:if="{{formData.startDate}}">{{formData.startDate}}</text>
+              <text wx:else class="placeholder">请选择</text>
+            </view>
+          </picker>
+        </view>
+
       </view>
 
       <!-- 弹窗操作按钮 -->
@@ -231,6 +244,17 @@
             <view class="form-input picker-input">
               <text wx:if="{{formData.category}}">{{formData.category}}</text>
               <text wx:else class="placeholder">选填</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 开始阅读时间 -->
+        <view class="form-group">
+          <text class="form-label">开始阅读时间</text>
+          <picker mode="date" value="{{formData.startDate}}" start="2000-01-01" end="2100-12-31" bindchange="onStartDateChange">
+            <view class="form-input picker-input">
+              <text wx:if="{{formData.startDate}}">{{formData.startDate}}</text>
+              <text wx:else class="placeholder">请选择</text>
             </view>
           </picker>
         </view>

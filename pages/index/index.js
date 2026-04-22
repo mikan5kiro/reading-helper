@@ -9,7 +9,7 @@ Page({
     showMoreMenu: false,
     showEditModal: false,
     currentBookId: '',
-    categories: ['小说', '心理', '社会', '成功', '经济', '哲学', '其他'],
+    categories: ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'],
     categoryIndex: -1,
     formData: {
       title: '',
@@ -46,10 +46,21 @@ Page({
           progressPercent = book.progress;
         }
         const progressBlockCount = Math.ceil(progressPercent / 20);
+        
+        // 计算已读天数
+        let daysReading = 0;
+        if (book.startDate) {
+          const startDate = new Date(book.startDate);
+          const today = new Date();
+          const diffTime = Math.abs(today - startDate);
+          daysReading = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+        
         return {
           ...book,
           progressPercent,
-          progressBlockCount
+          progressBlockCount,
+          daysReading
         };
       });
       
@@ -63,13 +74,22 @@ Page({
   },
 
   showAddModal() {
+    // 获取今天的日期作为默认值
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const defaultDate = `${year}-${month}-${day}`;
+    
     this.setData({
       showAddModal: true,
       categoryIndex: -1,
       formData: {
         title: '',
         author: '',
-        category: ''
+        category: '',
+        totalPages: '',
+        startDate: defaultDate
       }
     });
   },
@@ -80,6 +100,13 @@ Page({
     this.setData({
       categoryIndex: index,
       'formData.category': category
+    });
+  },
+
+  onStartDateChange(e) {
+    const date = e.detail.value;
+    this.setData({
+      'formData.startDate': date
     });
   },
 
@@ -191,6 +218,15 @@ Page({
     // 阻止事件冒泡
   },
 
+  onEditCategoryChange(e) {
+    const index = e.detail.value;
+    const category = this.data.categories[index];
+    this.setData({
+      editCategoryIndex: index,
+      'formData.category': category
+    });
+  },
+
   onFormInput(e) {
     const { field } = e.currentTarget.dataset;
     const { value } = e.detail;
@@ -200,7 +236,7 @@ Page({
   },
 
   submitForm() {
-    const { title, author, category } = this.data.formData;
+    const { title, author, category, startDate } = this.data.formData;
     
     if (!title.trim()) {
       wx.showToast({
@@ -214,7 +250,8 @@ Page({
       title: title.trim(),
       author: author.trim(),
       category: category || '',
-      status: 'reading'
+      status: 'reading',
+      startDate: startDate
     };
     
     app.addBook(bookData);
@@ -297,12 +334,16 @@ Page({
     const book = app.globalData.books.find(b => b.id === bookid);
     
     if (book) {
+      const editCategoryIndex = this.data.categories.findIndex(c => c === book.category);
       this.setData({
         formData: {
           title: book.title,
           author: book.author || '',
-          totalPages: book.totalPages || ''
+          category: book.category || '',
+          totalPages: book.totalPages || '',
+          startDate: book.startDate || ''
         },
+        editCategoryIndex: editCategoryIndex >= 0 ? editCategoryIndex : -1,
         showMoreMenu: false,
         showEditModal: true
       });
@@ -330,7 +371,7 @@ Page({
   },
 
   submitEditForm() {
-    const { title, author, totalPages } = this.data.formData;
+    const { title, author, category, totalPages, startDate } = this.data.formData;
     const bookid = this.data.currentBookId;
     
     if (!title.trim()) {
@@ -344,7 +385,9 @@ Page({
     app.updateBook(bookid, {
       title: title.trim(),
       author: author.trim(),
-      totalPages: parseInt(totalPages) || 0
+      category: category || '',
+      totalPages: totalPages ? parseInt(totalPages) : 0,
+      startDate: startDate
     });
     
     this.loadReadingBooks();
