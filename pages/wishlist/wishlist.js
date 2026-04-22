@@ -1,6 +1,7 @@
 // pages/wishlist/wishlist.js
 const app = getApp();
-const { PageBase, formatDate } = require('../../utils/pageBase.js');
+const { PageBase } = require('../../utils/pageBase.js');
+const { BookService, BookActionService } = require('../../service/bookService.js');
 
 Page({
   data: {
@@ -8,9 +9,7 @@ Page({
   },
 
   onLoad() {
-    // 初始化页面基类
     this.pageBase = new PageBase(this);
-    this.setData({ isLoading: true });
     this.loadData();
   },
 
@@ -18,44 +17,27 @@ Page({
     this.loadData();
   },
 
-  // 加载数据
   loadData() {
     this.loadWishBooks();
   },
 
   loadWishBooks() {
     this.pageBase.loadBooksByStatus('wish', (books) => {
-      // 按创建时间降序排序，新添加的书籍排在前面
-      const sortedBooks = (books || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-      // 添加添加日期字符串
-      const booksWithDate = sortedBooks.map(book => {
-        const addDateStr = book.createdAt ? formatDate(book.createdAt) : '未知';
-        return {
-          ...book,
-          addDateStr
-        };
-      });
-      this.setData({
-        wishBooks: booksWithDate,
-        isLoading: false
-      });
+      const wishBooks = BookService.processWishBooks(books);
+      this.setData({ wishBooks });
     });
   },
 
   startReading(e) {
     const { bookid } = e.currentTarget.dataset;
-    
     wx.showModal({
       title: '确认',
       content: '确定要开始阅读这本书吗？',
       success: (res) => {
         if (res.confirm) {
-          app.startReading(bookid);
+          BookActionService.startReading(bookid);
           this.loadWishBooks();
-          wx.showToast({
-            title: '已添加到在读书籍',
-            icon: 'success'
-          });
+          wx.showToast({ title: '已添加到在读书籍', icon: 'success' });
         }
       }
     });
@@ -72,55 +54,37 @@ Page({
 
   submitForm() {
     const { title, author, category } = this.data.formData;
-    
     if (!title.trim()) {
-      wx.showToast({
-        title: '请输入书名',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请输入书名', icon: 'none' });
       return;
     }
-    
-    const bookData = {
-      title: title.trim(),
-      author: author.trim(),
-      category: category || '',
+    const result = BookActionService.addBook({
+      title,
+      author,
+      category,
       status: 'wish'
-    };
-    
-    app.addBook(bookData);
-    this.loadWishBooks();
-    this.hideAddModal();
-    
-    wx.showToast({
-      title: '添加成功',
-      icon: 'success'
     });
+    if (result.success) {
+      this.loadWishBooks();
+      this.hideAddModal();
+      wx.showToast({ title: '添加成功', icon: 'success' });
+    }
   },
 
   submitEditForm() {
     const { title, author, category } = this.data.formData;
     const bookid = this.data.currentBookId;
-    
     if (!title.trim()) {
-      wx.showToast({
-        title: '请输入书名',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请输入书名', icon: 'none' });
       return;
     }
-    
-    app.updateBook(bookid, {
+    BookActionService.updateBook(bookid, {
       title: title.trim(),
       author: author.trim(),
       category: category || ''
     });
-    
     this.loadWishBooks();
     this.setData({ showEditModal: false });
-    wx.showToast({
-      title: '编辑成功',
-      icon: 'success'
-    });
+    wx.showToast({ title: '编辑成功', icon: 'success' });
   }
 });

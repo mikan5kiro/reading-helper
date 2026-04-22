@@ -1,9 +1,9 @@
 // utils/pageBase.js
 
 const app = getApp();
-const { CATEGORIES, formatDate, formatFinishedDate, calculateReadingDays, groupBooksByMonth, getTodayString } = require('./common.js');
+const { CATEGORIES, getTodayString } = require('./common.js');
 
-// 页面基类
+// 页面基类 - 只负责UI逻辑
 class PageBase {
   constructor(page) {
     this.page = page;
@@ -11,7 +11,6 @@ class PageBase {
     this.bindMethods();
   }
 
-  // 初始化数据
   initData() {
     this.page.data = {
       ...this.page.data,
@@ -34,19 +33,14 @@ class PageBase {
       }
     };
     
-    // 页面数据缓存
     this.page._cachedData = {
       books: {}
     };
   }
 
-  // 绑定方法
   bindMethods() {
-    // 加载逻辑
     this.page.loadBooks = this.loadBooks.bind(this);
     this.page.loadBooksByStatus = this.loadBooksByStatus.bind(this);
-    
-    // 模态框控制
     this.page.showAddModal = this.showAddModal.bind(this);
     this.page.hideAddModal = this.hideAddModal.bind(this);
     this.page.showEditModal = this.showEditModal.bind(this);
@@ -55,54 +49,40 @@ class PageBase {
     this.page.hideMoreMenu = this.hideMoreMenu.bind(this);
     this.page.showProgressModal = this.showProgressModal.bind(this);
     this.page.hideProgressModal = this.hideProgressModal.bind(this);
-    
-    // 表单处理
     this.page.onFormInput = this.onFormInput.bind(this);
     this.page.onCategoryChange = this.onCategoryChange.bind(this);
     this.page.onEditCategoryChange = this.onEditCategoryChange.bind(this);
     this.page.onStartDateChange = this.onStartDateChange.bind(this);
     this.page.onDateChange = this.onDateChange.bind(this);
-    
-    // 通用操作
     this.page.stopPropagation = this.stopPropagation.bind(this);
     this.page.deleteBook = this.deleteBook.bind(this);
   }
 
-  // 加载书籍数据
   loadBooks() {
-    // 只有在数据更新时才重新加载
     if (app.checkDataUpdated()) {
       app.loadBooks();
-      // 数据更新时清除缓存
       this.clearCache();
     }
   }
 
-  // 清除缓存
   clearCache() {
     this.page._cachedData = {
       books: {}
     };
   }
 
-  // 根据状态加载书籍
   loadBooksByStatus(status, callback) {
     try {
       const books = app.getBooksByStatus(status);
-      
-      // 生成缓存键
       const cacheKey = `${status}_${books.length}_${books[books.length - 1]?.createdAt || ''}_${books[books.length - 1]?.updatedAt || ''}`;
       
-      // 检查缓存
       if (this.page._cachedData.books[cacheKey]) {
-        // 使用缓存数据
         if (callback) {
           callback(this.page._cachedData.books[cacheKey]);
         }
         return;
       }
       
-      // 缓存数据
       this.page._cachedData.books[cacheKey] = books;
       
       if (callback) {
@@ -116,7 +96,6 @@ class PageBase {
     }
   }
 
-  // 获取状态文本
   getStatusText(status) {
     const statusMap = {
       reading: '在读',
@@ -126,7 +105,6 @@ class PageBase {
     return statusMap[status] || status;
   }
 
-  // 显示添加模态框
   showAddModal() {
     const today = getTodayString();
     this.page.setData({
@@ -143,12 +121,10 @@ class PageBase {
     });
   }
 
-  // 隐藏添加模态框
   hideAddModal() {
     this.page.setData({ showAddModal: false });
   }
 
-  // 显示编辑模态框
   showEditModal(book) {
     if (!book) return;
     
@@ -169,12 +145,10 @@ class PageBase {
     });
   }
 
-  // 隐藏编辑模态框
   hideEditModal() {
     this.page.setData({ showEditModal: false });
   }
 
-  // 显示更多菜单
   showMoreMenu(e) {
     const { bookid } = e.currentTarget.dataset;
     this.page.setData({
@@ -183,12 +157,10 @@ class PageBase {
     });
   }
 
-  // 隐藏更多菜单
   hideMoreMenu() {
     this.page.setData({ showMoreMenu: false });
   }
 
-  // 显示进度调节模态框
   showProgressModal(e) {
     const { bookid } = e.currentTarget.dataset;
     const book = this.page.data.readingBooks && this.page.data.readingBooks.find(b => b.id === bookid);
@@ -201,12 +173,10 @@ class PageBase {
     }
   }
 
-  // 隐藏进度调节模态框
   hideProgressModal() {
     this.page.setData({ showProgressModal: false });
   }
 
-  // 表单输入处理
   onFormInput(e) {
     const { field } = e.currentTarget.dataset;
     const { value } = e.detail;
@@ -215,7 +185,6 @@ class PageBase {
     });
   }
 
-  // 分类选择处理
   onCategoryChange(e) {
     const index = e.detail.value;
     const category = this.page.data.categories[index];
@@ -225,7 +194,6 @@ class PageBase {
     });
   }
 
-  // 编辑分类选择处理
   onEditCategoryChange(e) {
     const index = e.detail.value;
     const category = this.page.data.categories[index];
@@ -235,29 +203,22 @@ class PageBase {
     });
   }
 
-  // 开始日期选择处理
   onStartDateChange(e) {
     this.page.setData({
       'formData.startDate': e.detail.value
     });
   }
 
-  // 日期选择处理
   onDateChange(e) {
     this.page.setData({
       'formData.finishedDate': e.detail.value
     });
   }
 
-  // 阻止事件冒泡
-  stopPropagation() {
-    // 阻止事件冒泡
-  }
+  stopPropagation() {}
 
-  // 删除书籍
   deleteBook() {
     const bookid = this.page.data.currentBookId;
-    
     wx.showModal({
       title: '确认',
       content: '确定要删除这本书吗？',
@@ -269,7 +230,6 @@ class PageBase {
             title: '删除成功',
             icon: 'success'
           });
-          // 重新加载数据
           if (this.page.loadData) {
             this.page.loadData();
           }
@@ -278,7 +238,6 @@ class PageBase {
     });
   }
 
-  // 格式化日期为输入框格式
   formatDateForInput(timestamp) {
     if (!timestamp) return getTodayString();
     const date = new Date(timestamp);
@@ -289,13 +248,6 @@ class PageBase {
   }
 }
 
-// 导出模块
 module.exports = {
-  PageBase,
-  CATEGORIES,
-  formatDate,
-  formatFinishedDate,
-  calculateReadingDays,
-  groupBooksByMonth,
-  getTodayString
+  PageBase
 };

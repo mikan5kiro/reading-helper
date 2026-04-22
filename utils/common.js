@@ -1,10 +1,8 @@
 // utils/common.js
 
-// 书籍分类列表
-export const CATEGORIES = ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'];
+const CATEGORIES = ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'];
 
-// 格式化日期
-export function formatDate(timestamp) {
+function formatDate(timestamp) {
   if (!timestamp) return '未知';
   const date = new Date(timestamp);
   const year = date.getFullYear();
@@ -13,8 +11,7 @@ export function formatDate(timestamp) {
   return `${year}-${month}-${day}`;
 }
 
-// 格式化完成日期
-export function formatFinishedDate(timestamp) {
+function formatFinishedDate(timestamp) {
   if (!timestamp) return '';
   const date = new Date(timestamp);
   const month = date.getMonth() + 1;
@@ -22,8 +19,7 @@ export function formatFinishedDate(timestamp) {
   return `${month}月${day}日读完`;
 }
 
-// 计算已读天数
-export function calculateReadingDays(startDate) {
+function calculateReadingDays(startDate) {
   if (!startDate) return 0;
   const start = new Date(startDate);
   const today = new Date();
@@ -31,16 +27,14 @@ export function calculateReadingDays(startDate) {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// 验证表单
-export function validateForm(formData) {
+function validateForm(formData) {
   if (!formData.title || !formData.title.trim()) {
     return { valid: false, message: '请输入书名' };
   }
   return { valid: true };
 }
 
-// 按月份分组书籍
-export function groupBooksByMonth(books, formatDateFunc) {
+function groupBooksByMonth(books, formatDateFunc) {
   if (!books || books.length === 0) {
     return [];
   }
@@ -77,11 +71,20 @@ export function groupBooksByMonth(books, formatDateFunc) {
   return Object.values(groups);
 }
 
-// 获取今天的日期字符串
-export function getTodayString() {
+function getTodayString() {
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+module.exports = {
+  CATEGORIES,
+  formatDate,
+  formatFinishedDate,
+  calculateReadingDays,
+  validateForm,
+  groupBooksByMonth,
+  getTodayString
+};
