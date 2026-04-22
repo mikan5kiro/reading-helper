@@ -1,47 +1,39 @@
 // pages/index/index.js
 const app = getApp();
-const { CATEGORIES, calculateReadingDays, getTodayString } = require('../../utils/common.js');
+const { PageBase, calculateReadingDays, getTodayString } = require('../../utils/pageBase.js');
 
 Page({
   data: {
-    readingBooks: [],
-    isLoading: false,
-    showAddModal: false,
-    showMoreMenu: false,
-    showEditModal: false,
-    currentBookId: '',
-    categories: CATEGORIES,
-    categoryIndex: -1,
-    formData: {
-      title: '',
-      author: '',
-      category: ''
-    }
+    readingBooks: []
   },
 
   onLoad() {
+    // 初始化页面基类
+    this.pageBase = new PageBase(this);
     this.setData({ isLoading: true });
-    app.loadBooks();
-    this.loadReadingBooks();
+    this.loadData();
   },
 
   onShow() {
-    app.loadBooks();
+    this.loadData();
+  },
+
+  // 加载数据
+  loadData() {
+    this.loadBooks();
     this.loadReadingBooks();
   },
 
   loadReadingBooks() {
-    const showLoading = this.data.isLoading;
-    try {
-      const readingBooks = app.getBooksByStatus('reading');
-      console.log('加载的在读书籍:', readingBooks);
+    this.pageBase.loadBooksByStatus('reading', (books) => {
+      console.log('加载的在读书籍:', books);
       
       // 读取排序设置
       const settings = wx.getStorageSync('readingHelperSettings');
       const sortByStartDate = settings ? settings.sortByStartDate !== false : true;
       
       // 根据设置决定排序方式
-      const sortedBooks = (readingBooks || []).sort((a, b) => {
+      const sortedBooks = (books || []).sort((a, b) => {
         if (sortByStartDate) {
           // 按开始阅读时间降序排序，开始读得晚的排在上面
           const dateA = a.startDate || '';
@@ -82,62 +74,7 @@ Page({
         readingBooks: formattedBooks,
         isLoading: false
       });
-    } catch (error) {
-      console.error('加载在读书籍失败:', error);
-      this.setData({ 
-        readingBooks: [],
-        isLoading: false
-      });
-    }
-  },
-
-  showAddModal() {
-    // 获取今天的日期作为默认值
-    const defaultDate = getTodayString();
-    
-    this.setData({
-      showAddModal: true,
-      categoryIndex: -1,
-      formData: {
-        title: '',
-        author: '',
-        category: '',
-        totalPages: '',
-        startDate: defaultDate
-      }
     });
-  },
-
-  onCategoryChange(e) {
-    const index = e.detail.value;
-    const category = this.data.categories[index];
-    this.setData({
-      categoryIndex: index,
-      'formData.category': category
-    });
-  },
-
-  onStartDateChange(e) {
-    const date = e.detail.value;
-    this.setData({
-      'formData.startDate': date
-    });
-  },
-
-  showProgressPicker(e) {
-    const { bookid } = e.currentTarget.dataset;
-    const book = this.data.readingBooks.find(b => b.id === bookid);
-    if (book) {
-      this.setData({
-        showProgressModal: true,
-        currentBookId: bookid,
-        tempProgress: book.progressPercent
-      });
-    }
-  },
-
-  hideProgressModal() {
-    this.setData({ showProgressModal: false });
   },
 
   onProgressSliderChange(e) {
@@ -224,60 +161,6 @@ Page({
     }
   },
 
-  hideAddModal() {
-    this.setData({ showAddModal: false });
-  },
-
-  stopPropagation() {
-    // 阻止事件冒泡
-  },
-
-  onEditCategoryChange(e) {
-    const index = e.detail.value;
-    const category = this.data.categories[index];
-    this.setData({
-      editCategoryIndex: index,
-      'formData.category': category
-    });
-  },
-
-  onFormInput(e) {
-    const { field } = e.currentTarget.dataset;
-    const { value } = e.detail;
-    this.setData({
-      [`formData.${field}`]: value
-    });
-  },
-
-  submitForm() {
-    const { title, author, category, startDate } = this.data.formData;
-    
-    if (!title.trim()) {
-      wx.showToast({
-        title: '请输入书名',
-        icon: 'none'
-      });
-      return;
-    }
-    
-    const bookData = {
-      title: title.trim(),
-      author: author.trim(),
-      category: category || '',
-      status: 'reading',
-      startDate: startDate
-    };
-    
-    app.addBook(bookData);
-    this.loadReadingBooks();
-    this.hideAddModal();
-    
-    wx.showToast({
-      title: '添加成功',
-      icon: 'success'
-    });
-  },
-
   onSliderChange(e) {
     const { bookid } = e.currentTarget.dataset;
     const progress = e.detail.value;
@@ -329,58 +212,41 @@ Page({
     });
   },
 
-  showMoreMenu(e) {
-    const { bookid } = e.currentTarget.dataset;
-    this.setData({
-      currentBookId: bookid,
-      showMoreMenu: true
-    });
-  },
-
-  hideMoreMenu() {
-    this.setData({
-      showMoreMenu: false
-    });
-  },
-
   editBook() {
     const bookid = this.data.currentBookId;
     const book = app.globalData.books.find(b => b.id === bookid);
-    
     if (book) {
-      const editCategoryIndex = this.data.categories.findIndex(c => c === book.category);
-      this.setData({
-        formData: {
-          title: book.title,
-          author: book.author || '',
-          category: book.category || '',
-          totalPages: book.totalPages || '',
-          startDate: book.startDate || ''
-        },
-        editCategoryIndex: editCategoryIndex >= 0 ? editCategoryIndex : -1,
-        showMoreMenu: false,
-        showEditModal: true
-      });
+      this.pageBase.showEditModal(book);
+      this.setData({ showMoreMenu: false });
     }
   },
 
-  deleteBook() {
-    const bookid = this.data.currentBookId;
+  submitForm() {
+    const { title, author, category, startDate } = this.data.formData;
     
-    wx.showModal({
-      title: '确认',
-      content: '确定要删除这本书吗？',
-      success: (res) => {
-        if (res.confirm) {
-          app.deleteBook(bookid);
-          this.loadReadingBooks();
-          this.setData({ showMoreMenu: false });
-          wx.showToast({
-            title: '删除成功',
-            icon: 'success'
-          });
-        }
-      }
+    if (!title.trim()) {
+      wx.showToast({
+        title: '请输入书名',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    const bookData = {
+      title: title.trim(),
+      author: author.trim(),
+      category: category || '',
+      status: 'reading',
+      startDate: startDate
+    };
+    
+    app.addBook(bookData);
+    this.loadReadingBooks();
+    this.hideAddModal();
+    
+    wx.showToast({
+      title: '添加成功',
+      icon: 'success'
     });
   },
 
@@ -410,9 +276,5 @@ Page({
       title: '编辑成功',
       icon: 'success'
     });
-  },
-
-  hideEditModal() {
-    this.setData({ showEditModal: false });
   }
 });
