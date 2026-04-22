@@ -9,7 +9,7 @@ Page({
     showMoreMenu: false,
     showEditModal: false,
     currentBookId: '',
-    categories: ['小说', '非小说', '传记', '历史', '科技', '商业', '心理学', '哲学', '艺术', '其他'],
+    categories: ['小说', '心理', '社会', '成功', '经济', '哲学', '其他'],
     categoryIndex: -1,
     formData: {
       title: '',
