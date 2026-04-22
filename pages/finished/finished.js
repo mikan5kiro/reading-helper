@@ -26,20 +26,15 @@ Page({
   },
 
   onLoad() {
-    // 页面加载时初始化数据
+    this.setData({ isLoading: true });
     this.loadFinishedBooks();
   },
 
   onShow() {
-    // 只在数据更新时才重新加载
-    if (app.checkDataUpdated()) {
-      this.loadFinishedBooks();
-    }
+    this.loadFinishedBooks();
   },
 
   loadFinishedBooks() {
-    this.setData({ isLoading: true });
-    
     try {
       const finishedBooks = app.getBooksByStatus('finished');
       console.log('加载的已读书籍:', finishedBooks);
@@ -60,7 +55,7 @@ Page({
       this.setData({ 
         groupedBooks: [],
         totalCount: 0,
-        isLoading: false 
+        isLoading: false
       });
     }
   },

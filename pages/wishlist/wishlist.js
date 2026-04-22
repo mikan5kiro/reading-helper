@@ -4,7 +4,7 @@ const app = getApp();
 Page({
   data: {
     wishBooks: [],
-    isLoading: true,
+    isLoading: false,
     showAddModal: false,
     showMoreMenu: false,
     showEditModal: false,
@@ -19,24 +19,15 @@ Page({
   },
 
   onLoad() {
-    this.loadWishBooks();
-  },
-
-  onLoad() {
-    // 页面加载时初始化数据
+    this.setData({ isLoading: true });
     this.loadWishBooks();
   },
 
   onShow() {
-    // 只在数据更新时才重新加载
-    if (app.checkDataUpdated()) {
-      this.loadWishBooks();
-    }
+    this.loadWishBooks();
   },
 
   loadWishBooks() {
-    this.setData({ isLoading: true });
-    
     try {
       const wishBooks = app.getBooksByStatus('wish');
       // 按创建时间降序排序，新添加的书籍排在前面
@@ -57,7 +48,7 @@ Page({
       console.error('加载愿望单书籍失败:', error);
       this.setData({ 
         wishBooks: [],
-        isLoading: false 
+        isLoading: false
       });
     }
   },

@@ -19,6 +19,7 @@ Page({
   },
 
   onLoad() {
+    this.setData({ isLoading: true });
     app.loadBooks();
     this.loadReadingBooks();
   },
@@ -29,6 +30,7 @@ Page({
   },
 
   loadReadingBooks() {
+    const showLoading = this.data.isLoading;
     try {
       const readingBooks = app.getBooksByStatus('reading');
       console.log('加载的在读书籍:', readingBooks);
@@ -72,12 +74,14 @@ Page({
       console.log('格式化后的书籍数据:', formattedBooks);
       
       this.setData({
-        readingBooks: formattedBooks
+        readingBooks: formattedBooks,
+        isLoading: false
       });
     } catch (error) {
       console.error('加载在读书籍失败:', error);
       this.setData({ 
-        readingBooks: []
+        readingBooks: [],
+        isLoading: false
       });
     }
   },
