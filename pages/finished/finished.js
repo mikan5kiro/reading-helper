@@ -5,7 +5,7 @@ Page({
   data: {
     groupedBooks: [],
     totalCount: 0,
-    isLoading: false,
+    isLoading: true,
     showMoreMenu: false,
     showEditModal: false,
     showAddModal: false,
@@ -19,10 +19,6 @@ Page({
       category: '',
       finishedDate: ''
     }
-  },
-
-  onLoad() {
-    this.loadFinishedBooks();
   },
 
   onLoad() {
