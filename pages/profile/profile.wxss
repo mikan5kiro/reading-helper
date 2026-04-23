@@ -48,24 +48,34 @@
 
 /* 统计卡片区域 */
 .stats-section {
-  padding: 24px 16px;
-  background-color: #ffffff;
   margin-top: 12px;
-  border-bottom: 1px solid #e8e8e8;
+  padding: 12px 0;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-left: 16px;
+  margin-right: 16px;
+  width: auto;
+  box-sizing: border-box;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 0;
 }
 
 .stat-card {
   text-align: center;
-  padding: 12px 8px;
+  padding: 8px 4px;
   background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-right: 1px solid #f0f0f0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.stat-card:last-child {
+  border-right: none;
 }
 
 .stat-number {
@@ -83,22 +93,39 @@
 
 /* 功能入口列表 */
 .menu-section {
-  background-color: #ffffff;
   margin-top: 12px;
-  border-bottom: 1px solid #e8e8e8;
+  padding: 0 16px;
+  background-color: #f8f8f8;
+}
+
+/* 功能入口圆角容器 */
+.menu-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin: 0;
 }
 
 .menu-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
-  border-bottom: 1px solid #e8e8e8;
-  min-height: 40px;
+  padding: 14px 12px;
+  min-height: 48px;
+  border-bottom: 1px solid #f0f0f0;
+  box-sizing: border-box;
 }
 
-.menu-item:last-child {
+.menu-container .menu-item:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.menu-container .menu-item:last-child {
   border-bottom: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .menu-item:active {
@@ -118,6 +145,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.menu-icon-img {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
 }
 
 .menu-text {
