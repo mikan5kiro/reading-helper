@@ -271,4 +271,18 @@
       </view>
     </view>
   </view>
+
+  <!-- 恭喜读完弹窗 -->
+  <view wx:if="{{showCongratsModal}}" class="modal-overlay" bindtap="hideCongratsModal">
+    <view class="modal-content congrats-modal" catchtap="stopPropagation">
+      <view class="congrats-emoji">🎉</view>
+      <text class="congrats-title">恭喜读完！</text>
+      <text class="congrats-count">这是你本月读完的第 {{thisMonthCount}} 本书 🎊</text>
+      <view class="modal-footer" style="justify-content: center;">
+        <view class="btn btn-primary" bindtap="hideCongratsModal">
+          <text>太棒了</text>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

@@ -8,6 +8,8 @@ Page({
     showAddModal: false,
     showMoreMenu: false,
     showEditModal: false,
+    showCongratsModal: false,
+    thisMonthCount: 0,
     currentBookId: '',
     categories: ['文学', '人文社科', '自然科学', '经济与商业', '计算机', '艺术与设计', '生活与健康', '童书', '教材/考试/工具书', '其他'],
     categoryIndex: -1,
@@ -373,13 +375,29 @@ Page({
         if (res.confirm) {
           app.markAsFinished(bookid);
           this.loadReadingBooks();
-          wx.showToast({
-            title: '已标记为已读',
-            icon: 'success'
+          
+          // 计算本月已读数量
+          const finishedBooks = app.getBooksByStatus('finished');
+          const now = new Date();
+          const currentYear = now.getFullYear();
+          const currentMonth = now.getMonth() + 1;
+          const thisMonthCount = finishedBooks.filter(book => {
+            if (!book.finishedAt) return false;
+            const date = new Date(book.finishedAt);
+            return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
+          }).length;
+          
+          this.setData({
+            showCongratsModal: true,
+            thisMonthCount: thisMonthCount
           });
         }
       }
     });
+  },
+
+  hideCongratsModal() {
+    this.setData({ showCongratsModal: false });
   },
 
   showMoreMenu(e) {

@@ -209,6 +209,51 @@
   font-weight: 500;
 }
 
+/* 恭喜读完弹窗 */
+.congrats-modal {
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 0;
+}
+
+.congrats-emoji {
+  font-size: 48px;
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+
+.congrats-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.congrats-count {
+  font-size: 15px;
+  color: #666666;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.congrats-modal .modal-footer {
+  padding: 16px 24px 24px;
+  border-top: 1px solid #f0f0f0;
+  justify-content: center;
+  gap: 0;
+}
+
+.congrats-modal .modal-footer .btn {
+  width: 160px;
+  padding: 10px 0;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
 /* 表单样式 */
 .form-group {
   margin-bottom: 24rpx;
