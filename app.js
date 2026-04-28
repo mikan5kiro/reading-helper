@@ -117,5 +117,24 @@ App({
       finished: allBooks.filter(book => book.status === 'finished').length,
       wish: allBooks.filter(book => book.status === 'wish').length
     };
-  }
+  },
+
+  // 全局分享配置
+  getShareConfig() {
+    const appConfig = require('./config/appConfig');
+    return {
+      title: appConfig.shareTitle,
+      path: '/pages/index/index?from=share',
+      imageUrl: '/images/share.png'
+    };
+  },
+
+  // 全局分享到朋友圈配置
+  // getTimelineConfig() {
+  //   const appConfig = require('./config/appConfig');
+  //   return {
+  //     title: appConfig.shareTitle,
+  //     query: 'from=share'
+  //   };
+  // }
 });

@@ -20,7 +20,7 @@ Page({
     }
   },
 
-  onLoad() {
+  onLoad(options) {
     this.setData({ isLoading: true });
     app.loadBooks();
     this.loadReadingBooks();
@@ -485,5 +485,13 @@ Page({
 
   hideEditModal() {
     this.setData({ showEditModal: false });
-  }
+  },
+
+  onShareAppMessage() {
+    return getApp().getShareConfig();
+  },
+
+  // onShareTimeline() {
+  //   return getApp().getTimelineConfig();
+  // }
 });

@@ -235,5 +235,13 @@ Page({
 
   hideEditModal() {
     this.setData({ showEditModal: false });
-  }
+  },
+
+  onShareAppMessage() {
+    return getApp().getShareConfig();
+  },
+
+  // onShareTimeline() {
+  //   return getApp().getTimelineConfig();
+  // }
 });

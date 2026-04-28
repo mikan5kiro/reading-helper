@@ -66,5 +66,13 @@ Page({
     wx.navigateTo({
       url: '/pages/settings/settings'
     });
-  }
+  },
+
+  onShareAppMessage() {
+    return getApp().getShareConfig();
+  },
+
+  // onShareTimeline() {
+  //   return getApp().getTimelineConfig();
+  // }
 });

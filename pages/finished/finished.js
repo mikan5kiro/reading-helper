@@ -349,5 +349,13 @@ Page({
       title: '编辑成功',
       icon: 'success'
     });
-  }
+  },
+
+  onShareAppMessage() {
+    return getApp().getShareConfig();
+  },
+
+  // onShareTimeline() {
+  //   return getApp().getTimelineConfig();
+  // }
 });
