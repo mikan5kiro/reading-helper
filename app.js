@@ -124,8 +124,8 @@ App({
     const appConfig = require('./config/appConfig');
     return {
       title: appConfig.shareTitle,
-      path: '/pages/index/index?from=share',
-      imageUrl: '/images/share.png'
+      path: '/pages/index/index?from=share'
+      // imageUrl: '/images/share.png'
     };
   },
 
